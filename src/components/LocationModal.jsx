@@ -2,14 +2,28 @@ import { X } from "lucide-react";
 import { useState } from "react";
 
 const LocationModal = ({ onClose }) => {
-  const [city, setCity] = useState("")
+  const [city, setCity] = useState("");
 
-  const handleSubmit = (e) => { 
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const value = city.trim()
-    console.log(value)
-  }
+    const value = city.trim();
+    console.log(value);
+  };
 
+  const handleGeoLocations = () => {
+    navigator.geolocation.getCurrentPosition(
+      (positions) => {
+        const { latitude, longitude } = positions.coords;
+        console.log({ latitude, longitude });
+      },
+      (error) => {
+        console.log(error);
+      },
+      {
+        timeout: 10000,
+      },
+    );
+  };
 
   return (
     <div
@@ -48,6 +62,7 @@ const LocationModal = ({ onClose }) => {
         <div className="">
           <button
             type="button"
+            onClick={handleGeoLocations}
             className="text-lg w-full font-medium hover:scale-105 transition-all bg-blue-500 px-5 py-1 rounded-4xl delay-500 text-gray-100"
           >
             Use My Locations
