@@ -1,19 +1,35 @@
 import { X } from "lucide-react";
 import { useState } from "react";
 import { getGeolocation } from "../services/get-geolocation";
+import { useNavigate } from "react-router";
 
 const LocationModal = ({ onClose }) => {
+  const navigate = useNavigate();
   const [city, setCity] = useState("");
+  const [error, setError] = useState("");
+
+  const goToPage = (location) => {
+    navigate("/weather", { state: { location } });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const value = city.trim();
     // console.log(value);
+    if (!value) {
+      setError("Please Enter a city name");
+      return;
+    }
 
     try {
-      const result = await getGeolocation(value);
-      console.log(result);
+      const location = await getGeolocation(value);
+      // console.log(result);
+      if (!location) {
+        setError("Geocoding request failed!");
+      }
+      goToPage(location);
     } catch (error) {
-      console.log(error);
+      setError(error);
     }
   };
 
@@ -21,7 +37,8 @@ const LocationModal = ({ onClose }) => {
     navigator.geolocation.getCurrentPosition(
       (positions) => {
         const { latitude, longitude } = positions.coords;
-        console.log({ latitude, longitude });
+        // console.log({ latitude, longitude });
+        goToPage({ name: "Your Locations", lat: latitude, lon: longitude });
       },
       (error) => {
         console.log(error);
@@ -74,6 +91,14 @@ const LocationModal = ({ onClose }) => {
           >
             Use My Locations
           </button>
+        </div>
+
+        <div className="">
+          {error && (
+            <p className="text-red-500 text-md font-medium text-center p-2">
+              {error}
+            </p>
+          )}
         </div>
       </div>
     </div>
